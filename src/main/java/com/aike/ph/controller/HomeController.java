@@ -32,7 +32,7 @@ public class HomeController {
     @GetMapping("/mkdir")
     public String mkdir(@RequestParam(value = "") String path) throws IOException, URISyntaxException {
         Configuration conf = new Configuration();
-        String hdfsPath = "hdfs://hadoop.aikezc.com:8020";
+        String hdfsPath = "hdfs://master:9000";
         FileSystem hdfs = FileSystem.get(new URI(hdfsPath), conf);
         String newDir = "/home/"+path;
         System.out.println("创建路径："+newDir);
@@ -58,7 +58,7 @@ public class HomeController {
     public String touchFile(@RequestParam(value = "") String name) throws IOException, URISyntaxException {
         Configuration configuration = new Configuration();
 
-        String hdfsPath = "hdfs://hadoop.aikezc.com:8020";
+        String hdfsPath = "hdfs://master:9000";
         FileSystem hdfs = FileSystem.get(new URI(hdfsPath), configuration);
 
         String filePath = "/home/"+name;
@@ -80,7 +80,7 @@ public class HomeController {
     @GetMapping("/copyFromLocalFile")
     public String copyFromLocalFile(@RequestParam(value = "") String path) throws IOException, URISyntaxException {
         Configuration conf = new Configuration();
-        String hdfsPath = "hdfs://hadoop.aikezc.com:8020";
+        String hdfsPath = "hdfs://hdfs://master:9000";
         FileSystem hdfs = FileSystem.get(new URI(hdfsPath), conf);
         String from_Linux = "D:/Dev/hadoop/home/hadoop-2.10.1/etc/靓仔.txt";
         String to_HDFS = "/home/";
@@ -99,7 +99,7 @@ public class HomeController {
     @GetMapping("/down")
     public String down(@RequestParam(value = "") String path) throws IOException, URISyntaxException {
         Configuration conf = new Configuration();
-        String hdfsPath = "hdfs://hadoop.aikezc.com:8020";
+        String hdfsPath = "hdfs://hdfs://master:9000";
         FileSystem hdfs = FileSystem.get(new URI(hdfsPath), conf);
         String from_HDFS = "/home/靓仔.txt";
         String to_Linux = "D:\\Dev\\hadoop\\home\\hadoop-2.10.1\\etc";
@@ -117,7 +117,7 @@ public class HomeController {
     @GetMapping("/list")
     public String list(@RequestParam(value = "") String path) throws IOException, URISyntaxException {
         Configuration conf = new Configuration();
-        String hdfspath = "hdfs://hadoop.aikezc.com:8020";
+        String hdfspath = "hdfs://hdfs://master:9000";
         FileSystem hdfs = FileSystem.get(URI.create(hdfspath), conf);
         String watchHDFS = "/"+path;
 
@@ -129,7 +129,7 @@ public class HomeController {
     @GetMapping("/blockInfo")
     public String blockInfo(@RequestParam(value = "") String path) throws IOException, URISyntaxException {
         Configuration conf = new Configuration();
-        String hdfspath = "hdfs://hadoop.aikezc.com:8020";
+        String hdfspath = "hdfs://hdfs://master:9000";
         FileSystem hdfs = FileSystem.get(new URI(hdfspath), conf);
 
         Path file = new Path("/home"+path);
@@ -149,7 +149,7 @@ public class HomeController {
     public String write(@RequestParam(value = "") String path) throws IOException, URISyntaxException {
         Configuration conf = new Configuration();
 
-        String hdfsPath = "hdfs://hadoop.aikezc.com:8020";
+        String hdfsPath = "hdfs://hdfs://master:9000";
         FileSystem hdfs = FileSystem.get(URI.create(hdfsPath), conf);
 
         String filePath = "/home/靓仔.txt";

@@ -13,29 +13,36 @@ import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.GenericOptionsParser;
-import org.apache.log4j.BasicConfigurator;
-
 
 public class WordCount {
-    public static class Map extends Mapper<Object,Text,Text,IntWritable>{
-        private static IntWritable one = new IntWritable(1);
+
+    public static class TokenizerMapper
+            extends Mapper<Object, Text, Text, IntWritable>{
+
+        private final static IntWritable one = new IntWritable(1);
         private Text word = new Text();
+
         @Override
-        public void map(Object key, Text value, Context context) throws IOException,InterruptedException{
-            StringTokenizer st = new StringTokenizer(value.toString());
-            while(st.hasMoreTokens()){
-                word.set(st.nextToken());
+        public void map(Object key, Text value, Context context
+        ) throws IOException, InterruptedException {
+            StringTokenizer itr = new StringTokenizer(value.toString());
+            while (itr.hasMoreTokens()) {
+                word.set(itr.nextToken());
                 context.write(word, one);
             }
         }
     }
 
-    public static class Reduce extends Reducer<Text,IntWritable,Text,IntWritable>{
-        private static IntWritable result = new IntWritable();
+    public static class IntSumReducer
+            extends Reducer<Text,IntWritable,Text,IntWritable> {
+        private IntWritable result = new IntWritable();
+
         @Override
-        public void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException,InterruptedException{
+        public void reduce(Text key, Iterable<IntWritable> values,
+                           Context context
+        ) throws IOException, InterruptedException {
             int sum = 0;
-            for(IntWritable val:values){
+            for (IntWritable val : values) {
                 sum += val.get();
             }
             result.set(sum);
@@ -43,29 +50,20 @@ public class WordCount {
         }
     }
 
-    static {
-        try {
-            System.load("D:/Dev/hadoop/hadoop-2.10.1/bin/hadoop.dll");//建议采用绝对地址，bin目录下的hadoop.dll文件路径
-        } catch (UnsatisfiedLinkError e) {
-            System.err.println("Native code library failed to load.\n" + e);
-            System.exit(1);
-        }
-    }
-
-    public static void main(String[] args) throws Exception{
-        //BasicConfigurator.configure(); //自动快速地使用缺省Log4j环境。
-        System.setProperty("HADOOP_USER_NAME", "root");
+    public static void main(String[] args) throws Exception {
         Configuration conf = new Configuration();
-        String[] otherArgs = new GenericOptionsParser(conf,args).getRemainingArgs();
-        if(otherArgs.length != 2){
-            System.err.println("Usage WordCount <int> <out>");
+        conf.set("mapred.job.tracker", "master:9001");//自己额外加的代码
+        String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
+        if (otherArgs.length != 2) {
+            System.err.println("Usage: wordcount <in> <out>");
             System.exit(2);
         }
-        Job job = new Job(conf,"word count");
+
+        Job job = new Job(conf, "word count");
         job.setJarByClass(WordCount.class);
-        job.setMapperClass(Map.class);
-        job.setCombinerClass(Reduce.class);
-        job.setReducerClass(Reduce.class);
+        job.setMapperClass(TokenizerMapper.class);
+        job.setCombinerClass(IntSumReducer.class);
+        job.setReducerClass(IntSumReducer.class);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(IntWritable.class);
         FileInputFormat.addInputPath(job, new Path(otherArgs[0]));
